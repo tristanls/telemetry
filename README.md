@@ -82,14 +82,16 @@ Which should result in something like:
 
 ## Documentation
 
-Please refere to [generated Go documentation](https://godoc.org/github.com/tristanls/telemetry)
+Please refer to [generated Go documentation](https://godoc.org/github.com/tristanls/telemetry)
 
 ## Releases
 
-We follow semantic versioning policy (see: [semver.org](http://semver.org/)):
+We follow semantic versioning policy ([semver.org](http://semver.org/)) with a caveat:
 
 > Given a version number MAJOR.MINOR.PATCH, increment the:
 >
 >MAJOR version when you make incompatible API changes,<br/>
 >MINOR version when you add functionality in a backwards-compatible manner, and<br/>
 >PATCH version when you make backwards-compatible bug fixes.
+
+**caveat**: Major version zero is a special case indicating development version that may make incompatible API changes without incrementing MAJOR version.
