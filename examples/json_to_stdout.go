@@ -4,10 +4,10 @@ import (
 	"github.com/tristanls/telemetry"
 )
 
-var emitter = telemetry.NewEmitter()
-var writer = telemetry.NewWriter()
-
 func main() {
+
+	var emitter = telemetry.NewEmitter()
+	var writer = telemetry.NewWriter()
 
 	emitter.AddListener(func(event *telemetry.Event) {
 		writer.Write(event.Marshal())
