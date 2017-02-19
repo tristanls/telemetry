@@ -58,7 +58,9 @@ func (event *Event) WithProvenance(fields Fields) *Event {
 // enrichment of the Event is needed.
 func (event *Event) Marshal() map[string]interface{} {
 	fields := make(map[string]interface{}, len(event.data)+1)
-	fields[ProvenanceKey] = event.provenance
+	if event.provenance != nil {
+		fields[ProvenanceKey] = event.provenance
+	}
 	for k, v := range event.data {
 		fields[k] = v
 	}
