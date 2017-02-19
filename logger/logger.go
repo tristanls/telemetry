@@ -104,11 +104,18 @@ func (logger *Logger) Log(level Level, args ...interface{}) {
 	if logger.level >= level {
 		event := logger.newEvent()
 		defer logger.releaseEvent(event)
-		logger.emitter.Emit(event.WithFields(telemetry.Fields{
-			"type":    "log",
-			"level":   level.String(),
-			"message": fmt.Sprint(args...),
-		}))
+		if len(args) > 0 {
+			logger.emitter.Emit(event.WithFields(telemetry.Fields{
+				"type":    "log",
+				"level":   level.String(),
+				"message": fmt.Sprint(args...),
+			}))
+		} else {
+			logger.emitter.Emit(event.WithFields(telemetry.Fields{
+				"type":  "log",
+				"level": level.String(),
+			}))
+		}
 	}
 }
 
@@ -126,11 +133,18 @@ func (logger *Logger) Logf(level Level, format string, args ...interface{}) {
 
 func (logger *Logger) Loge(level Level, event *telemetry.Event, args ...interface{}) {
 	if logger.level >= level {
-		logger.emitter.Emit(event.WithFields(telemetry.Fields{
-			"type":    "log",
-			"level":   level.String(),
-			"message": fmt.Sprint(args...),
-		}))
+		if len(args) > 0 {
+			logger.emitter.Emit(event.WithFields(telemetry.Fields{
+				"type":    "log",
+				"level":   level.String(),
+				"message": fmt.Sprint(args...),
+			}))
+		} else {
+			logger.emitter.Emit(event.WithFields(telemetry.Fields{
+				"type":  "log",
+				"level": level.String(),
+			}))
+		}
 	}
 }
 
