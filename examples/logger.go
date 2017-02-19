@@ -13,7 +13,7 @@ func main() {
 
 	emitter.AddListener(func(event *telemetry.Event) {
 		writer.Write(event.WithProvenance(telemetry.Fields{
-			"example": "github.com/tristanls/telemetry/logger/logger.go",
+			"example": "github.com/tristanls/telemetry/examples/logger.go",
 		}).Marshal())
 	})
 
