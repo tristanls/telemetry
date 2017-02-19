@@ -5,6 +5,7 @@ import (
 	"sync"
 
 	"github.com/tristanls/telemetry"
+	"strings"
 )
 
 // Log level type
@@ -35,12 +36,42 @@ func (level Level) String() string {
 	return "unknown"
 }
 
+func ParseLevel(level string) (Level, error) {
+	switch strings.ToLower(level) {
+	case "debug":
+		return Debug, nil
+	case "info":
+		return Info, nil
+	case "warn":
+		return Warn, nil
+	case "error":
+		return Error, nil
+	case "fatal":
+		return Fatal, nil
+	}
+
+	var l Level
+	return l, telemetry.New().WithFields(telemetry.Fields{
+		"error": "Expected log level to be one of: debug, info, warn, error, fatal.",
+		"args":  []string{level},
+	})
+}
+
 // Creates new Logger instance that will emit Events on provided telemetry emitter using provided telemetry
 // configuration.
 func NewLogger(telemetry *telemetry.Telemetry, emitter *telemetry.Emitter) *Logger {
 	return &Logger{
 		telemetry: telemetry,
 		emitter:   emitter,
+		level:     Info,
+	}
+}
+
+func NewLoggerWithLevel(telemetry *telemetry.Telemetry, emitter *telemetry.Emitter, level Level) *Logger {
+	return &Logger{
+		telemetry: telemetry,
+		emitter:   emitter,
+		level:     level,
 	}
 }
 
@@ -49,6 +80,9 @@ type Logger struct {
 
 	// Telemetry emitter on which to emit log events.
 	emitter *telemetry.Emitter
+
+	// Logger's log level
+	level Level
 
 	// Reusable empty event pool.
 	eventPool sync.Pool
@@ -67,39 +101,47 @@ func (logger *Logger) releaseEvent(event *telemetry.Event) {
 }
 
 func (logger *Logger) Log(level Level, args ...interface{}) {
-	event := logger.newEvent()
-	defer logger.releaseEvent(event)
-	logger.emitter.Emit(event.WithFields(telemetry.Fields{
-		"type":    "log",
-		"level":   level.String(),
-		"message": fmt.Sprint(args...),
-	}))
+	if logger.level >= level {
+		event := logger.newEvent()
+		defer logger.releaseEvent(event)
+		logger.emitter.Emit(event.WithFields(telemetry.Fields{
+			"type":    "log",
+			"level":   level.String(),
+			"message": fmt.Sprint(args...),
+		}))
+	}
 }
 
 func (logger *Logger) Logf(level Level, format string, args ...interface{}) {
-	event := logger.newEvent()
-	defer logger.releaseEvent(event)
-	logger.emitter.Emit(event.WithFields(telemetry.Fields{
-		"type":    "log",
-		"level":   level.String(),
-		"message": fmt.Sprintf(format, args...),
-	}))
+	if logger.level >= level {
+		event := logger.newEvent()
+		defer logger.releaseEvent(event)
+		logger.emitter.Emit(event.WithFields(telemetry.Fields{
+			"type":    "log",
+			"level":   level.String(),
+			"message": fmt.Sprintf(format, args...),
+		}))
+	}
 }
 
 func (logger *Logger) Loge(level Level, event *telemetry.Event, args ...interface{}) {
-	logger.emitter.Emit(event.WithFields(telemetry.Fields{
-		"type":    "log",
-		"level":   level.String(),
-		"message": fmt.Sprint(args...),
-	}))
+	if logger.level >= level {
+		logger.emitter.Emit(event.WithFields(telemetry.Fields{
+			"type":    "log",
+			"level":   level.String(),
+			"message": fmt.Sprint(args...),
+		}))
+	}
 }
 
 func (logger *Logger) Logef(level Level, event *telemetry.Event, format string, args ...interface{}) {
-	logger.emitter.Emit(event.WithFields(telemetry.Fields{
-		"type":    "log",
-		"level":   level.String(),
-		"message": fmt.Sprintf(format, args...),
-	}))
+	if logger.level >= level {
+		logger.emitter.Emit(event.WithFields(telemetry.Fields{
+			"type":    "log",
+			"level":   level.String(),
+			"message": fmt.Sprintf(format, args...),
+		}))
+	}
 }
 
 func (logger *Logger) Debug(args ...interface{}) {
