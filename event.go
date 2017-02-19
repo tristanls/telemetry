@@ -1,5 +1,6 @@
 package telemetry
 
+var ErrorKey = "error"
 var ProvenanceKey = "provenance"
 var TimestampKey = "timestamp"
 
@@ -65,4 +66,27 @@ func (event *Event) Marshal() map[string]interface{} {
 		fields[k] = v
 	}
 	return fields
+}
+
+// Event implements the Error interface so that structured telemetry can be returned everywhere an error can.
+func (event Event) Error() string {
+	err, exists := event.data[ErrorKey]
+	if !exists {
+		return toString(event)
+	}
+	str, ok := err.(string)
+	if !ok {
+		return toString(event)
+	}
+	return str
+}
+
+// Default serializer for use with Error interface implementation.
+func toString(event Event) string {
+	formatter := &JSONFormatter{}
+	str, err := formatter.Format(event.Marshal())
+	if err != nil {
+		return err.Error()
+	}
+	return string(str)
 }
