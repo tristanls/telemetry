@@ -19,6 +19,15 @@ const (
 	Debug
 )
 
+// All logging levels.
+var AllLevels = []Level{
+	Fatal,
+	Error,
+	Warn,
+	Info,
+	Debug,
+}
+
 func (level Level) String() string {
 	switch level {
 	case Debug:
