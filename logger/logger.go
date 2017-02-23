@@ -2,10 +2,9 @@ package logger
 
 import (
 	"fmt"
-	"sync"
-
-	"github.com/tristanls/telemetry"
 	"strings"
+	"sync"
+	"github.com/tristanls/telemetry"
 )
 
 // Log level type
