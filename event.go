@@ -29,14 +29,7 @@ func (event *Event) WithField(key string, value interface{}) *Event {
 
 // Adds specified fields to the Event and returns new Event with those fields included.
 func (event *Event) WithFields(fields Fields) *Event {
-	data := make(Fields, len(event.data)+len(fields))
-	for k, v := range event.data {
-		data[k] = v
-	}
-	for k, v := range fields {
-		data[k] = v
-	}
-	return &Event{telemetry: event.telemetry, provenance: event.provenance, data: data}
+	return &Event{telemetry: event.telemetry, provenance: event.provenance, data: Join(event.data, fields)}
 }
 
 // Adds specified provenance to the Event and returns new Event with that provenance included.
